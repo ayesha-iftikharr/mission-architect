@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission Architect</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#EEF2F6;--panel:#fff;--ink:#11202F;--mute:#55667A;--line:#C3CFDB;--acc:#0B7F86;--accink:#fff;--warn:#A84B08;--bad:#B3261E;--good:#1E7A46;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070E1A;--panel:#101D30;--ink:#E6EDF5;--mute:#9AAABB;--line:#2B4562;--acc:#4FD1C5;--accink:#06222A;--warn:#FFA94D;--bad:#FF7A70;--good:#6FD39A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070E1A;--panel:#101D30;--ink:#E6EDF5;--mute:#9AAABB;--line:#2B4562;--acc:#4FD1C5;--accink:#06222A;--warn:#FFA94D;--bad:#FF7A70;--good:#6FD39A;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2{font-family:Sora,Inter,system-ui,sans-serif;margin:0;letter-spacing:-.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:clamp(1.7rem,4vw,2.4rem)}
+.lede{color:var(--mute);max-width:62ch;margin:6px 0 12px}
+.ctl{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;font-size:.9rem;color:var(--mute)}
+select{font:inherit;background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;margin-left:6px}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.step{margin-bottom:22px}
+.step h2{font-size:1.08rem;margin-bottom:2px}
+.hint{color:var(--mute);font-size:.88rem;margin:0 0 10px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.opt,.act{text-align:left;background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;font:inherit}
+.opt{min-height:98px}
+.opt:hover,.act:hover{border-color:var(--acc)}
+.opt[aria-pressed="true"]{border-color:var(--acc);box-shadow:inset 0 0 0 1.5px var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--panel))}
+.opt[disabled],.act[disabled]{opacity:.45;cursor:not-allowed}
+.opt b,.act b{display:block;font-family:Sora,Inter,sans-serif;font-size:.97rem}
+.opt small,.act small{display:block;color:var(--mute);font-size:.82rem;line-height:1.35}
+.opt .st{margin-top:6px;font-size:.8rem;font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+aside,.panel{background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:16px}
+aside{position:sticky;top:12px}
+@media(max-width:820px){aside{position:static}}
+.panel{margin-bottom:14px}
+aside h2{font-size:1.05rem;margin-bottom:8px}
+.m{margin:9px 0}
+.m .row{display:flex;justify-content:space-between;gap:8px;font-size:.86rem;font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.m.over .bar i{background:var(--bad)}
+.m.over .row span:last-child{color:var(--bad);font-weight:600}
+.odds{margin:12px 0;padding:10px;border:1px dashed var(--line);border-radius:8px;font-size:.88rem}
+.odds b{font-family:Sora,sans-serif;font-size:1.4rem;display:block}
+.btn{font:600 1rem Inter,sans-serif;background:var(--acc);color:var(--accink);border:0;border-radius:10px;padding:12px 16px;width:100%;cursor:pointer}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.alt{background:transparent;color:var(--ink);border:1.5px solid var(--line);margin-top:8px}
+.why{font-size:.85rem;color:var(--warn);margin:8px 0 0;min-height:1.2em}
+#flight{display:none}
+canvas{width:100%;height:auto;display:block;background:radial-gradient(ellipse at center,color-mix(in srgb,var(--acc) 8%,transparent),transparent 70%)}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 18px;align-items:end}
+.sc{font-family:Sora,sans-serif;font-size:2.2rem;line-height:1}
+.sc small{display:block;font:500 .8rem Inter,sans-serif;color:var(--mute)}
+.pr{display:grid;gap:10px}
+.pr h2{font-size:1.1rem}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.ev{border-left:4px solid var(--warn);padding-left:14px;display:grid;gap:10px}
+.ev p{margin:0}
+.who{color:var(--acc);font-weight:600;font-size:.9rem}
+#log{list-style:none;padding:0;margin:0;font-size:.9rem;max-height:220px;overflow:auto}
+#log li{padding:6px 0;border-bottom:1px solid var(--line)}
+#log b{font-weight:600}
+#result h2{font-size:1.5rem}
+.big{font-family:Sora,sans-serif;font-size:2.6rem}
+.toast{position:fixed;left:50%;top:18%;transform:translateX(-50%);font:700 1.7rem Sora,sans-serif;color:var(--good);pointer-events:none;z-index:9;animation:fl 1.4s ease-out forwards;text-shadow:0 2px 14px rgba(0,0,0,.4)}
+@keyframes fl{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,-60px)}}
+kbd,.kb{font:600 .75rem Inter,sans-serif;border:1px solid var(--line);border-radius:4px;padding:0 4px}
+body{background-image:radial-gradient(1px 1px at 20px 30px,color-mix(in srgb,var(--ink) 35%,transparent),transparent),radial-gradient(1.5px 1.5px at 120px 90px,color-mix(in srgb,var(--ink) 25%,transparent),transparent),radial-gradient(1px 1px at 70px 140px,color-mix(in srgb,var(--ink) 30%,transparent),transparent);background-size:180px 170px}
+.opt{transition:transform .15s,border-color .15s}.opt:hover:not([disabled]){transform:translateY(-2px)}
+.ic{display:block;font-size:1.5rem;line-height:1;margin-bottom:6px}
+.pl{float:right;margin:0 0 4px 8px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+dialog{background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:14px;max-width:520px;width:calc(100% - 32px);padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog li{margin-bottom:6px}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}@media(prefers-reduced-motion:no-preference){.ev{animation:sh .35s}}@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1><span aria-hidden="true">🚀</span> Mission Architect</h1>
+<p class="lede">Build a spacecraft on a budget, then fly it live. Science only counts once it reaches Earth, your battery is always draining, and the universe keeps throwing problems at you.</p>
+<div class="ctl">
+<label>Difficulty <select id="diff"><option value="0">Cadet</option><option value="1" selected>Flight director</option><option value="2">Mission chief</option></select></label>
+<label>Players <select id="ppl"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+<label><input type="checkbox" id="snd" checked> Sound</label>
+<button id="helpb" class="btn alt" style="width:auto;margin:0;padding:6px 12px">How to play</button>
+<span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">Online crew:
+<input id="nm" type="text" placeholder="Your name" maxlength="16" style="font:inherit;background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;width:120px">
+<select id="rl" style="margin:0"><option value="0">Mission planner</option><option value="1">Spacecraft engineer</option><option value="2">Scientist</option><option value="3">Comms officer</option></select>
+<input id="rc" type="text" placeholder="Room code" maxlength="12" style="font:inherit;background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;width:110px">
+<button id="hostb" class="btn alt" style="width:auto;margin:0;padding:6px 12px">Host</button><button id="joinb" class="btn alt" style="width:auto;margin:0;padding:6px 12px">Join</button><span id="nst"></span></span>
+</div>
+
+<dialog id="intro"><h2>How to fly a mission</h2><ol style="padding-left:20px;margin:10px 0"><li><b>Design.</b> Pick a destination, rocket, spacecraft, engine, antenna, orbit and instruments. Stay inside the budget and the rocket’s mass limit.</li><li><b>Launch.</b> The rocket and the orbit insertion can fail, so reliability matters.</li><li><b>Fly.</b> Each turn, choose Observe, Downlink or Recharge. Handle surprises before the timer runs out.</li><li><b>Score.</b> Only data sent to Earth counts. Reach the mission objective for a bonus.</li></ol><details><summary>Quick glossary</summary><p><b>Delta-v:</b> the total change in speed a spacecraft needs to reach its target.<br><b>Isp:</b> how efficiently an engine uses propellant. Higher means less fuel for the same job.<br><b>Downlink:</b> sending data to Earth. Data only scores once it arrives.<br><b>Brownout:</b> the battery runs out and the craft drops into a low-power safe mode.<br><b>Reserve:</b> unspent budget kept for emergency fixes and upgrades.</p></details><button class="btn" id="introgo" style="margin-top:12px">Let’s fly</button></dialog>
+<div id="design" class="grid">
+<main><div class="ctl" style="margin-bottom:14px"><button id="safeb" class="btn alt" style="width:auto;margin:0;padding:8px 14px">Auto-fill a safe design</button><button id="randb" class="btn alt" style="width:auto;margin:0;padding:8px 14px">Surprise me</button></div><div id="steps"></div></main>
+<aside>
+<h2>Your spacecraft</h2><div id="ship" style="margin-bottom:10px"></div><h2>Mission ledger</h2>
+<div id="led"></div>
+<div class="odds"><b id="odds">–</b>chance to launch and arrive</div>
+<div class="m"><div class="row"><span>Flight reserve</span><span id="resv">–</span></div></div>
+<button class="btn" id="go" disabled>Start countdown</button>
+<p class="why" id="why"></p>
+<div id="board" style="margin-top:12px;font-size:.85rem"></div>
+<details style="margin-top:12px;font-size:.82rem;color:var(--mute)"><summary>Where the numbers come from</summary><p><b>Real figures:</b> Falcon 9 (22,800 kg expended, about $70M list, 99.5% success), Falcon Heavy (63,800 kg, about $97M to $150M), Firefly Alpha (about 1,030 kg, about $15M), and Europa Clipper’s masses, power and cost.</p><p><b>Estimates:</b> Alpha and Falcon Heavy reliability.</p><p><b>Game values:</b> spacecraft costs, bus and instrument stats, power use, events and scoring.</p><p><a href="https://orbitalradar.com/launch-vehicles/falcon-9">Falcon 9 data</a> · <a href="https://www.aiaa.org/vehicle-guide/vehicles/falcon">AIAA Falcon guide</a> · <a href="https://greenlaunch.space/feeds/blog/cost-per-pound-space-launch">Launch prices</a> · <a href="https://www.jpl.nasa.gov/press-kits/europa-clipper/quick-facts/">JPL Clipper facts</a> · <a href="https://jpl.nasa.gov/press-kits/europa-clipper/mission/spacecraft">JPL Clipper spacecraft</a> · <a href="https://spacenews.com/?p=507073">SpaceNews Clipper cost</a></p></details>
+</aside>
+</div>
+
+<div id="flight">
+<div class="panel"><canvas id="scene" width="600" height="140" role="img" aria-label="Spacecraft orbiting the target body"></canvas></div>
+<div class="panel dash">
+<div class="sc" id="score">0<small>points downlinked</small></div>
+<div class="sc" id="turnno" style="font-size:1.4rem">–<small>mission turn</small></div>
+<div id="dm"></div>
+</div>
+<div class="panel pr" id="prompt"></div>
+<div class="panel"><ol id="log" reversed></ol></div>
+<div class="panel" id="result" hidden></div>
+</div>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)},by=function(a,id){return a.filter(function(x){return x.id===id})[0]},ok=function(x){return x.ok};
+var DEST=[
+{id:"moon",n:"Moon",d:"Map ice at the south pole. Close and forgiving.",budget:520,dv:4,sf:1,dist:1,mult:1,ops:40,ins:.97,col:"#9aa3ad",goal:100,real:"Real analog: NASA’s Lunar Reconnaissance Orbiter, which has mapped the Moon since 2009. Radio signals take about 1.3 seconds each way."},
+{id:"mars",n:"Mars",d:"Hunt for signs of ancient water. Dimmer sunlight, slower links.",budget:820,dv:5,sf:.55,dist:.6,mult:1.5,ops:70,ins:.9,col:"#c8643c",goal:160,real:"Real analog: Mars Reconnaissance Orbiter, at Mars since 2006. Sunlight there is only about 43% as strong as at Earth, and radio signals take 3 to 22 minutes one way."},
+{id:"europa",n:"Europa",d:"Probe the ice shell of Jupiter’s moon. Faint sun, huge distance.",budget:1100,dv:8,sf:.3,dist:.35,mult:2.2,ops:110,ins:.85,col:"#9fc3d6",goal:240,real:"Real analog: Europa Clipper, launched in 2024 with enormous solar arrays because sunlight at Jupiter is only about 4% as strong as at Earth."},
+{id:"venus",n:"Venus",d:"Radar-map the cloud-covered surface. Blazing sunlight, sulfuric skies.",budget:650,dv:4.5,sf:1.8,dist:.8,mult:1.3,ops:55,ins:.88,col:"#e0b86a",goal:140,real:"Real analog: NASA’s Magellan, which radar-mapped nearly all of Venus in the early 1990s."},
+{id:"bennu",n:"Asteroid Bennu",d:"Study a rubble-pile asteroid. Weak gravity and a tricky approach.",budget:700,dv:5.2,sf:.6,dist:.7,mult:1.4,ops:60,ins:.92,col:"#6b6358",goal:150,real:"Real analog: NASA’s OSIRIS-REx, which grabbed a sample from asteroid Bennu and returned it to Earth in 2023."}];
+var LV=[
+{id:"s",n:"Small lifter (Firefly Alpha class)",cap:1030,cost:15,rel:.85,d:"About 1,030 kg to orbit for roughly $15M. Only light craft fit."},
+{id:"m",n:"Medium lifter (Falcon 9 class)",cap:22800,cost:70,rel:.995,d:"22,800 kg when expended, about $70M list price, 99.5% success rate."},
+{id:"h",n:"Heavy lifter (Falcon Heavy class)",cap:63800,cost:97,rel:.98,d:"63,800 kg to orbit for roughly $97M to $150M. Carried Europa Clipper."}];
+var BUS=[
+{id:"b",n:"Basic bus",mass:300,cost:80,sol:150,bat:100,hp:70,d:"Light and cheap. Fragile."},
+{id:"s",n:"Standard bus",mass:1000,cost:160,sol:300,bat:200,hp:100,d:"Good all-rounder."},
+{id:"h",n:"Hardened bus",mass:2900,cost:260,sol:450,bat:300,hp:140,d:"Flagship class: heavy, tough, power-rich. Europa Clipper’s dry mass was about 3,200 kg."}];
+var ENG=[
+{id:"sto",n:"Storable chemical",mass:60,cost:20,isp:320,d:"Simple. Needs a lot of propellant."},
+{id:"cry",n:"Cryogenic chemical",mass:90,cost:50,isp:450,d:"Efficient. Costs more."},
+{id:"ion",n:"Solar-electric ion",mass:80,cost:90,isp:2500,slow:2,d:"Tiny propellant load, but the slow spiral eats 2 turns of mission life."}];
+var COM=[
+{id:"l",n:"Low-gain antenna",mass:5,cost:10,pw:20,rate:6,d:"Slow trickle of data."},
+{id:"m",n:"Medium-gain antenna",mass:15,cost:25,pw:40,rate:14,d:"A sensible middle."},
+{id:"h",n:"High-gain dish",mass:40,cost:50,pw:70,rate:30,d:"Firehose, but thirsty."}];
+var ORB=[
+{id:"lo",n:"Low orbit",sci:1.3,contact:.5,life:9,rad:.6,d:"Sharp images, but the planet blocks half your link and orbit decays sooner."},
+{id:"mi",n:"Medium orbit",sci:1,contact:.75,life:12,rad:1,d:"Balanced coverage, contact and lifetime."},
+{id:"hi",n:"High orbit",sci:.7,contact:1,life:15,rad:1.4,d:"Always in view and long-lived, but blurrier science and more radiation."}];
+var INS=[
+{id:"cam",n:"Camera",mass:30,cost:25,pw:50,data:5,val:1.5,d:"Lots of cheap images."},
+{id:"spec",n:"Spectrometer",mass:60,cost:50,pw:100,data:4,val:3,d:"Reads chemical makeup."},
+{id:"rad",n:"Radar sounder",mass:90,cost:90,pw:200,data:6,val:4,d:"Sees beneath the surface. Power hungry."},
+{id:"seis",n:"Seismometer",mass:40,cost:40,pw:60,data:3,val:2.5,d:"Listens for quakes.",no:"europa,venus"},
+{id:"rov",n:"Rover",mass:120,cost:120,pw:120,data:5,val:3,d:"Drives to new sites.",no:"europa,venus,bennu"}];
+var ROLES=["Mission planner","Spacecraft engineer","Scientist","Comms officer"];
+var STEPS=[["dest","Choose your destination","Farther targets pay more points but need far more velocity change."],
+["lv","Choose a launch vehicle","Capacity is mass to low Earth orbit. Your craft plus propellant must fit."],
+["bus","Choose a spacecraft bus","Sets solar power, battery size and radiation toughness."],
+["eng","Choose propulsion","Higher Isp means less propellant (Δv = Isp × g × ln(launch mass ÷ dry mass))."],
+["com","Choose communications","Data is worth nothing until you send it home."],
+["orb","Choose an orbit","Orbit trades science quality against link time, lifetime and radiation."],
+["ins","Pick instruments","Each one makes data but draws power and costs money."]];
+var ST={dest:function(x){return "Budget $"+x.budget+"M · "+x.dv+" km/s · points ×"+x.mult+" · goal "+x.goal+" pts"},
+lv:function(x){return "$"+x.cost+"M · "+x.cap+" kg · "+Math.round(x.rel*100)+"% reliable"},
+bus:function(x){return "$"+x.cost+"M · "+x.mass+" kg · "+x.sol+" W solar · battery "+x.bat},
+eng:function(x){return "$"+x.cost+"M · "+x.mass+" kg · Isp "+x.isp+" s"},
+com:function(x){return "$"+x.cost+"M · "+x.mass+" kg · "+x.pw+" W · "+x.rate+" packets/pass"},
+orb:function(x){return x.life+" turns · science ×"+x.sci+" · link "+Math.round(x.contact*100)+"%"},
+ins:function(x){return "$"+x.cost+"M · "+x.mass+" kg · "+x.pw+" W · "+x.data+" packets"}};
+var ARR={dest:DEST,lv:LV,bus:BUS,eng:ENG,com:COM,orb:ORB,ins:INS};
+var S={dest:null,lv:null,bus:null,eng:null,com:null,orb:null,ins:[]},best=0,F=null,TM=null;
+var DFS=[{b:1.25,p:.6,t:0},{b:1,p:.75,t:12},{b:.85,p:.9,t:8}];
+function DF(){return DFS[+$("diff").value]}
+function mt(id,txt,pct,bad){var e=$(id);e.querySelector(".row span:last-child").textContent=txt;e.querySelector(".bar i").style.width=Math.max(0,Math.min(100,pct))+"%";e.classList.toggle("over",!!bad)}
+function mh(id,l){return '<div class="m" id="'+id+'"><div class="row"><span>'+l+'</span><span></span></div><div class="bar"><i></i></div></div>'}
+$("steps").innerHTML=STEPS.map(function(s){return '<section class="step"><h2>'+s[1]+'</h2><p class="hint">'+s[2]+'</p><div class="opts" id="o-'+s[0]+'"></div></section>'}).join("");
+$("led").innerHTML=mh("m-b","Budget")+mh("m-m","Launch mass")+'<div class="m"><div class="row"><span>Propellant</span><span id="prop">–</span></div></div>';
+$("dm").innerHTML=mh("d-bat","Battery")+mh("d-buf","Data waiting")+mh("d-ins","Instruments")+mh("d-res","Flight reserve")+mh("d-goal","Mission objective");
+function calc(){
+ var c={d:S.dest&&by(DEST,S.dest),lv:S.lv&&by(LV,S.lv),bus:S.bus&&by(BUS,S.bus),e:S.eng&&by(ENG,S.eng),cm:S.com&&by(COM,S.com),o:S.orb&&by(ORB,S.orb)};
+ c.ins=S.ins.map(function(i){return by(INS,i)});
+ var p=[c.lv,c.bus,c.e,c.cm],sum=function(k){return c.ins.reduce(function(a,x){return a+x[k]},0)+p.reduce(function(a,x){return a+(x&&x[k]||0)},0)};
+ c.budget=c.d?Math.round(c.d.budget*DF().b):0;
+ c.cost=sum("cost")+(c.d?c.d.ops:0);
+ c.dry=(c.bus?c.bus.mass:0)+(c.e?c.e.mass:0)+(c.cm?c.cm.mass:0)+c.ins.reduce(function(a,x){return a+x.mass},0);
+ c.prop=(c.d&&c.e)?c.dry*(Math.exp(c.d.dv*1000/(c.e.isp*9.80665))-1):0;
+ c.mass=c.dry+c.prop;
+ c.odds=(c.lv&&c.d)?c.lv.rel*c.d.ins:null;return c}
+function update(){
+ var c=calc();
+ Object.keys(ARR).forEach(function(k){
+  $("o-"+k).innerHTML=ARR[k].map(function(x){
+   var sel=k==="ins"?S.ins.indexOf(x.id)>-1:S[k]===x.id,dis=x.no&&x.no.indexOf(S.dest)>-1;
+   return '<button class="opt" data-k="'+k+'" data-id="'+x.id+'" aria-pressed="'+sel+'"'+((dis||(NET.on&&!mine(DR[k])))?" disabled":"")+'>'+ic(k,x)+'<b>'+x.n+'</b><small>'+(dis?"Not possible here.":x.d+(x.real?" <i>"+x.real+"</i>":""))+'</small><div class="st">'+ST[k](x)+'</div></button>'}).join("")});
+ mt("m-b","$"+Math.round(c.cost)+"M / "+(c.budget?"$"+c.budget+"M":"–")+(c.budget&&c.cost>c.budget?" (over)":""),c.budget?c.cost/c.budget*100:0,c.budget&&c.cost>c.budget);
+ mt("m-m",Math.round(c.mass)+" / "+(c.lv?c.lv.cap:"–")+" kg"+(c.lv&&c.mass>c.lv.cap?" (over)":""),c.lv?c.mass/c.lv.cap*100:0,c.lv&&c.mass>c.lv.cap);
+ $("prop").textContent=(c.e&&c.d)?Math.round(c.prop)+" kg ("+Math.round(c.prop/c.mass*100)+"%)":"–";
+ $("odds").textContent=c.odds!=null?Math.round(c.odds*100)+"%":"–";
+ $("resv").textContent=c.budget?"$"+Math.max(0,Math.round(c.budget-c.cost))+"M":"–";
+ var w="";
+ if(!c.d)w="Pick a destination.";else if(!c.lv)w="Pick a launch vehicle.";else if(!c.bus)w="Pick a spacecraft bus.";else if(!c.e)w="Pick a propulsion system.";else if(!c.cm)w="Pick a communications system.";else if(!c.o)w="Pick an orbit.";else if(!c.ins.length)w="Add at least one instrument.";
+ else if(c.cost>c.budget)w="Over budget by $"+Math.round(c.cost-c.budget)+"M.";
+ else if(c.mass>c.lv.cap)w="Launch mass is over capacity. Try a more efficient engine or fewer instruments.";
+ $("why").textContent=w;$("go").disabled=!!w||(NET.on&&!NET.host);ship();bc()}
+document.addEventListener("click",function(e){
+ var b=e.target.closest(".opt");if(!b||b.disabled)return;var k=b.dataset.k,id=b.dataset.id;if(NET.on&&!NET.host){send("pick",{k:k,id:id});return}
+ if(k==="ins"){var i=S.ins.indexOf(id);if(i>-1)S.ins.splice(i,1);else S.ins.push(id)}
+ else{S[k]=id;if(k==="dest")S.ins=S.ins.filter(function(x){return (by(INS,x).no||"").indexOf(id)<0})}
+ update()});
+$("diff").onchange=update;
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function show(v){$("design").style.display=v==="design"?"grid":"none";$("flight").style.display=v==="flight"?"block":"none";window.scrollTo(0,0)}
+function lg(t,m){LOGS.unshift("<b>"+t+":</b> "+m);if(LOGS.length>40)LOGS.length=40;$("log").innerHTML=LOGS.map(function(x){return "<li>"+x+"</li>"}).join("")}
+function dash(){var c=F.c,al=F.live.filter(ok).length;
+ mt("d-bat",Math.round(F.bat)+" / "+c.bus.bat,F.bat/c.bus.bat*100,F.bat<c.bus.bat*.2);
+ mt("d-buf",Math.round(F.buf)+" packets (worth "+Math.round(F.bufV)+")",F.buf/40*100,F.buf>40);
+ mt("d-ins",al+" of "+F.live.length+" working",al/F.live.length*100,al<F.live.length);
+ mt("d-res","$"+Math.round(F.res)+"M",F.res/Math.max(1,F.res0)*100,F.res<10);
+ mt("d-goal",Math.round(F.score)+" / "+c.d.goal+" points",F.score/c.d.goal*100,false);$("score").firstChild.nodeValue=Math.round(F.score);$("turnno").firstChild.nodeValue=Math.min(F.day+1,F.life)+" / "+F.life;bc()}
+function plan(m){var c=F.c,gen=c.bus.sol*c.d.sf*(F.dim>0?.5:1),al=F.live.filter(ok),use=20,bo=F.boost*(F.sw>0?1.3:1),r={data:0,val:0,cap:0};
+ if(m==="obs"){al.forEach(function(x){use+=x.i.pw;r.data+=x.i.data*c.o.sci*bo;r.val+=x.i.data*x.i.val*c.d.mult*c.o.sci*bo})}
+ if(m==="dl"){use+=c.cm.pw;r.cap=Math.max(1,Math.round(c.cm.rate*c.o.contact*c.d.dist*F.cm*(F.gs?2:1)*(F.ant>0?1.4:1)))}
+ if(m==="rch")gen*=1.5;
+ r.dBat=(gen-use)*.5;return r}
+var UPG=[{id:"sw",l:"Software upgrade",c:15,s:"+30% data for the next 3 Observe turns.",fn:function(){F.sw=3;return "New onboard software will squeeze out more data."}},{id:"ant",l:"Antenna boost",c:15,s:"+40% downlink for the next 3 Downlink turns.",fn:function(){F.ant=3;return "Ground crews tuned your antenna."}},{id:"ext",l:"Mission extension",c:25,s:"+2 turns of mission life.",fn:function(){F.life+=2;return "NASA approved an extended mission."}}];
+function beep(f,d){if(!$("snd").checked)return;try{var A=window.AC=window.AC||new(window.AudioContext||window.webkitAudioContext)(),o=A.createOscillator(),gn=A.createGain();o.frequency.value=f;gn.gain.value=.04;o.connect(gn);gn.connect(A.destination);o.start();o.stop(A.currentTime+d)}catch(e){}}
+function turn(){clearInterval(TM);
+ if(F.day>=F.life)return end("Your spacecraft reached the end of its planned life.");
+ if(!F.live.some(ok)&&F.buf<1)return end("Every instrument has failed.");
+ F.pr="t";dash();var n=+$("ppl").value,al=F.live.some(ok);
+ var h="<h2>Turn "+(F.day+1)+": choose a mode <small style=\"color:var(--mute);font-weight:400\">(or press O, D, R)</small></h2>"+(NET.on?'<p class="who">'+(mine(0)?"Mission planner, choose the mode.":whoIs(0)+" (mission planner) chooses the mode.")+"</p>":n>1?'<p class="who">Team decision: discuss, then pick together.</p>':"")+'<div class="acts">';
+ [["obs","Observe"],["dl","Downlink"],["rch","Recharge"]].forEach(function(m){var p=plan(m[0]);
+  var t=m[0]==="obs"?"Collect "+Math.round(p.data)+" packets.":m[0]==="dl"?"Send up to "+p.cap+" packets home.":"Aim panels at the Sun.";
+  h+='<button class="act" data-m="'+m[0]+'"'+((m[0]==="obs"&&!al)||(NET.on&&!mine(0))?" disabled":"")+'><b>'+m[1]+' ['+m[0].charAt(0).toUpperCase()+']</b><small>'+t+" Battery "+(p.dBat>=0?"+":"")+Math.round(p.dBat)+".</small></button>"});
+ h+="</div>";var us=UPG.filter(function(u){return !F.used[u.id]});if(us.length){h+='<p class="hint" style="margin:6px 0 0">Spend flight reserve on an upgrade (one use each):</p><div class="acts">';us.forEach(function(u){h+='<button class="act upg" data-u="'+u.id+'"'+((u.c>F.res||(NET.on&&!mine(0)))?" disabled":"")+'><b>'+u.l+' ($'+u.c+'M)</b><small>'+u.s+'</small></button>'});h+="</div>"}$("prompt").innerHTML=h;document.querySelectorAll("#prompt .upg").forEach(function(b){b.onclick=function(){if(NET.on&&!NET.host){send("upg",{id:b.dataset.u});return}var u=by(UPG,b.dataset.u);F.res-=u.c;F.used[u.id]=1;lg("Upgrade",u.fn());beep(660,.12);turn()}});
+ document.querySelectorAll("#prompt .act[data-m]").forEach(function(b){b.onclick=function(){if(NET.on&&!NET.host){send("act",{m:b.dataset.m});return}act(b.dataset.m)}})}
+function act(m){var p=plan(m),c=F.c,msg="",nb=F.bat+p.dBat;
+ if(nb<0){F.brown++;F.bat=0;p.data*=.3;p.val*=.3;p.cap=Math.max(1,Math.round(p.cap*.3));msg="Brownout! Safe mode cut the work. ";toast("Brownout!","var(--bad)")}else F.bat=Math.min(c.bus.bat,nb);
+ if(m==="obs"){F.buf+=p.data;F.bufV+=p.val;F.boost=1;msg+="Collected "+Math.round(p.data)+" packets."}
+ else if(m==="dl"){if(F.buf<.5)msg+="Nothing waiting to send.";else{var f=Math.min(1,p.cap/F.buf),pts=F.bufV*f;F.score+=pts;F.buf-=F.buf*f;F.bufV-=F.bufV*f;msg+="Sent "+Math.round(f*100)+"% of the buffer for +"+Math.round(pts)+" points.";toast("+"+Math.round(pts)+" points")}F.cm=1;F.gs=false}
+ else msg+="Battery charging in the sunlight.";
+ FX.push({k:m,t0:performance.now()});if(m==="obs"&&F.sw>0)F.sw--;if(m==="dl"&&F.ant>0)F.ant--;if(F.dim>0)F.dim--;F.day++;lg("Turn "+F.day,msg);dash();
+ if(Math.random()<DF().p)event();else turn()}
+function risk(){return Math.min(.85,Math.max(.15,.5*F.c.o.rad*100/F.c.bus.hp))}
+function kill(){var a=F.live.filter(ok);if(!a.length)return "";var t=a[Math.floor(Math.random()*a.length)];t.ok=false;F.lost++;toast("Instrument lost","var(--bad)");return t.i.n.toLowerCase()}
+var EV=[
+{role:1,t:"Solar flare",x:"A burst of radiation is heading for your spacecraft.",ch:[
+ {l:"Power down and hide",s:"Safe. Costs 10 battery.",fn:function(){F.bat=Math.max(0,F.bat-10);return "Instruments sat out the storm. Electronics survive radiation best when switched off."}},
+ {l:"Keep observing",s:"Risky, but flares can give rare data.",fn:function(){if(Math.random()<risk()){var n=kill();return n?"Radiation damaged the "+n+". Tougher buses and safer orbits lower this risk.":"The flare passed without damage."}F.buf+=4;F.bufV+=20*F.c.d.mult;return "Lucky! The flare lit up your sensors with rare data."}}]},
+{role:3,t:"Antenna pointing fault",x:"Your dish has drifted off target.",ch:[
+ {l:"Uplink a patch",s:"Costs $10M reserve.",cost:10,fn:function(){return "The patch worked. Reserve money buys fixes."}},
+ {l:"Wait it out",s:"Next downlink is halved.",fn:function(){F.cm=.5;return "You will limp along at half rate."}}]},
+{role:1,t:"Battery cell fault",x:"One battery cell is dropping out.",ch:[
+ {l:"Pay for a repair",s:"Costs $20M reserve.",cost:20,fn:function(){return "Engineers rerouted power around the bad cell."}},
+ {l:"Reboot the power system",s:"Lose a quarter of the charge.",fn:function(){F.bat*=.75;return "The reboot worked but drained the battery."}}]},
+{role:1,t:"Micrometeoroid swarm",x:"Tiny, very fast dust grains are on a collision course.",ch:[
+ {l:"Rotate to shield the craft",s:"Costs 8 battery.",fn:function(){F.bat=Math.max(0,F.bat-8);return "The thick side took the hits."}},
+ {l:"Hold position",s:"Risky. Saves power.",fn:function(){if(Math.random()<risk()*.6){var n=kill();return n?"A grain destroyed the "+n+".":"A grain hit, but nothing important broke."}return "Nothing hit. You saved power."}}]},
+{role:0,t:"Unexpected discovery",x:"Instruments spot something unusual on the surface.",ch:[
+ {l:"Retarget the instruments",s:"Next Observe gets 60% more data. Costs 15 battery.",fn:function(){F.boost=1.6;F.bat=Math.max(0,F.bat-15);return "Retargeted. Your next Observe will be richer."}},
+ {l:"Stay on schedule",s:"Small bonus now.",fn:function(){F.bufV+=10*F.c.d.mult;return "Logged for later study."}}]},
+{role:3,t:"Extra ground station window",x:"A big antenna on Earth can listen for a while.",ch:[
+ {l:"Plan a big downlink",s:"Next Downlink sends double.",fn:function(){F.gs=true;return "Your next Downlink will be doubled."}},
+ {l:"Keep observing",s:"Collect 3 free packets.",fn:function(){F.buf+=3;F.bufV+=6*F.c.d.mult;return "Collected a few extra packets."}}]},
+{role:1,t:"Solar dimming",x:"Dust or an eclipse is blocking much of your sunlight for two turns.",ch:[{l:"Switch to reserve power",s:"Costs $10M reserve. No power loss.",cost:10,fn:function(){return "Backup cells covered the gap."}},{l:"Ride it out",s:"Solar power is halved for 2 turns.",fn:function(){F.dim=2;return "Panels will make half power for two turns."}}]},
+{role:2,t:"Data corruption",x:"Some stored data has been scrambled.",ch:[
+ {l:"Pay for a patch",s:"Costs $10M reserve.",cost:10,fn:function(){return "Error-correcting software saved the data."}},
+ {l:"Re-verify the buffer",s:"Lose 20% of waiting data.",fn:function(){F.buf*=.8;F.bufV*=.8;return "Bad files were dumped."}}]}];
+function pick(ev,k){clearInterval(TM);var c=ev.ch[k];if(c.cost)F.res-=c.cost;lg(ev.t,c.fn());dash();turn()}
+function event(ix){ix=ix==null?Math.floor(Math.random()*EV.length):ix;var ev=EV[ix],n=+$("ppl").value,t=DF().t?Math.max(4,DF().t-Math.floor(F.day/3)):0;
+ var h='<div class="ev"><h2>'+ev.t+"</h2><p>"+ev.x+"</p>"+(NET.on?'<p class="who">'+ROLES[ev.role]+(mine(ev.role)?", your call.":": "+whoIs(ev.role)+" decides.")+"</p>":n>1?'<p class="who">Player '+(ev.role%n+1)+" ("+ROLES[ev.role]+"), your call.</p>":"")+(t?'<div class="bar"><i id="tbar" style="width:100%;transition:none;background:var(--warn)"></i></div><small id="tsec"></small>':"")+'<div class="acts">';
+ ev.ch.forEach(function(c,k){h+='<button class="act" data-k="'+k+'"'+((c.cost>F.res||(NET.on&&!mine(ev.role)))?" disabled":"")+"><b>"+(k+1)+". "+c.l+"</b><small>"+c.s+"</small></button>"});
+ $("prompt").innerHTML=h+"</div></div>";beep(300,.25);FX.push({k:"ev",t0:performance.now()});F.pr="e";F.evi=ix;bc();
+ document.querySelectorAll("#prompt .act").forEach(function(b){b.onclick=function(){if(NET.on&&!NET.host){send("ev",{k:+b.dataset.k});return}pick(ev,+b.dataset.k)}});
+ if(t&&!(NET.on&&!NET.host)){var left=t*10;TM=setInterval(function(){left--;$("tbar").style.width=left/(t*10)*100+"%";$("tsec").textContent=Math.ceil(left/10)+" seconds to decide";if(left<=30&&left%10===0)beep(880,.08);if(NET.on&&left%10===0)rt("gtick",{l:left,t:t});if(left<=0){clearInterval(TM);lg("Out of time","No decision was made, so the default plan ran.");pick(ev,ev.ch.length-1)}},100)}}
+function end(why,tip){clearInterval(TM);F.pr="o";var c=F.c,reached=F.day>0,bonus=Math.round(Math.max(0,F.res)*.1),goalB=(reached&&F.score>=c.d.goal)?30:0,tot=Math.round(F.score)+(reached?bonus:0)+goalB;
+ if(tot>best)best=tot;board(tot,c.d.n);
+ var T=130*c.d.mult*c.o.life/12,r=tot/T,h=!reached?"Mission lost":r>=1.2?"Outstanding mission":r>=.7?"Successful mission":tot>0?"Partial success":"Silent spacecraft";
+ var L=["Reaching "+c.d.n+" needs about "+c.d.dv+" km/s of velocity change. With "+c.e.n.toLowerCase()+", that took "+(c.prop/c.dry).toFixed(1)+" kg of propellant per kg of hardware."];
+ if(tip)L.push(tip);L.push(c.d.real);if(c.d.id==="europa")L.push("Benchmark: Europa Clipper launched at about 6,065 kg including 2,750 kg of propellant, carried 352 kg of instruments, made about 600 W from its solar arrays, and cost about $5.2B over its lifetime. It saved propellant with planetary flybys, which this game does not model. Your craft launched at "+Math.round(c.mass)+" kg with "+Math.round(c.prop)+" kg of propellant and "+Math.round(c.ins.reduce(function(a,x){return a+x.mass},0))+" kg of instruments.");
+ if(reached){if(F.bufV>F.score*.25&&F.bufV>10)L.push("About "+Math.round(F.bufV)+" points of data never got home. Data only counts once it is downlinked, so add comms capacity or schedule more Downlink turns.");
+  if(F.brown)L.push("You hit brownout "+F.brown+" time"+(F.brown>1?"s":"")+". Instruments draw power, so alternate Observe with Recharge or pick a bigger bus.");
+  if(F.lost)L.push("You lost "+F.lost+" instrument"+(F.lost>1?"s":"")+" to hazards. A tougher bus and a lower-radiation orbit reduce that risk.")}
+ $("prompt").innerHTML="";
+ $("result").hidden=false;
+ $("result").innerHTML="<h2>"+h+'</h2><div class="big">'+tot+" points</div><p>"+why+(reached?" Science sent home: "+Math.round(F.score)+". Reserve bonus: "+bonus+". Objective "+(goalB?"complete (+30). ":"missed ("+c.d.goal+" points needed). "):" ")+"Best score this session: "+best+".</p><h3 style=\"font-size:1rem;margin:12px 0 4px\">What this mission taught</h3><ul>"+L.map(function(t){return "<li>"+t+"</li>"}).join("")+'</ul><button class="btn" id="again">Fly this design again</button><button class="btn alt" id="redo">Redesign</button><button class="btn alt" id="copy">Copy mission summary</button>';
+ $("again").onclick=launch;$("copy").onclick=function(){var s="Mission Architect: "+h+" at "+c.d.n+", "+tot+" points. Design: "+c.lv.n+", "+c.bus.n+", "+c.e.n+", "+c.cm.n+", "+c.o.n+", "+c.ins.map(function(x){return x.n}).join(" + ")+".";try{navigator.clipboard.writeText(s);this.textContent="Copied!"}catch(e){this.textContent=s}};$("redo").onclick=function(){show("design");update()};if(NET.on&&NET.host)rt("gres",{h:$("result").innerHTML});bc();if(reached&&r>=.7)confetti()}
+async function launch(){var c=calc();
+ F={c:c,day:0,life:c.o.life-(c.e.slow||0),bat:c.bus.bat,buf:0,bufV:0,score:0,res:c.budget-c.cost,res0:c.budget-c.cost,live:c.ins.map(function(i){return{i:i,ok:true}}),cm:1,boost:1,gs:false,brown:0,lost:0,used:{},sw:0,ant:0,dim:0};
+ show("flight");LOGS=[];$("log").innerHTML="";$("result").hidden=true;dash();
+ $("prompt").innerHTML="<h2>Countdown</h2><p id='cd' class='big'></p>";
+ for(var i=3;i>0;i--){$("cd").textContent=i+"…";beep(440,.1);await sleep(700)}
+ $("cd").textContent="Liftoff!";beep(880,.4);LA=performance.now();await sleep(900);
+ if(Math.random()>c.lv.rel){lg("Launch","The vehicle failed during ascent.");return end("Your spacecraft was lost on the pad.","Launch failures come down to vehicle reliability. Heavier lifters fail less often.")}
+ lg("Launch","Clean ascent. Cruising to "+c.d.n+"…");await sleep(1200);
+ if(Math.random()>c.d.ins){lg("Arrival","The orbit insertion burn fell short.");return end("The spacecraft missed its orbit.","Capture burns get riskier at distant targets, which is why Europa is a high-risk, high-reward choice.")}
+ lg("Arrival","Orbit achieved. You have "+F.life+" turns. Good luck, Flight Director.");turn()}
+$("go").onclick=launch;
+var cv=$("scene"),g=cv.getContext("2d"),stars=[],RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+for(var i=0;i<70;i++)stars.push({x:Math.random()*600,y:Math.random()*140,s:Math.random()*.6+.2});
+function draw(t){requestAnimationFrame(draw);if(!F||$("flight").style.display!=="block")return;
+ var st=getComputedStyle(document.documentElement),ink=st.getPropertyValue("--ink").trim(),bad=st.getPropertyValue("--bad").trim();
+ g.clearRect(0,0,600,140);g.fillStyle=ink;
+ stars.forEach(function(s){if(!RM){s.x-=s.s*.4;if(s.x<0)s.x=600}g.globalAlpha=.2+s.s*.5;g.fillRect(s.x,s.y,1.6,1.6)});
+ g.globalAlpha=1;var sg=g.createRadialGradient(590,0,5,590,0,150);sg.addColorStop(0,"rgba(255,200,90,.55)");sg.addColorStop(1,"rgba(255,200,90,0)");g.fillStyle=sg;g.fillRect(0,0,600,140);var pg=g.createRadialGradient(290,58,4,300,70,32);pg.addColorStop(0,"rgba(255,255,255,.65)");pg.addColorStop(.45,F.c.d.col);pg.addColorStop(1,"#05080f");g.fillStyle=pg;g.beginPath();g.arc(300,70,28,0,7);g.fill();
+ g.strokeStyle=ink;g.globalAlpha=.3;g.beginPath();g.ellipse(300,70,100,38,0,0,7);g.stroke();g.globalAlpha=1;
+ var a=RM?F.day:t/(F.c.o.id==="lo"?600:F.c.o.id==="mi"?900:1300);
+ var low=F.bat<F.c.bus.bat*.2&&Math.floor(t/400)%2;
+ var px=300+100*Math.cos(a),py=70+38*Math.sin(a),acc=st.getPropertyValue("--acc").trim(),warn=st.getPropertyValue("--warn").trim(),now=performance.now();
+ g.fillStyle=acc;g.beginPath();g.arc(26,70,12,0,7);g.fill();g.fillStyle=ink;g.font="10px Inter,sans-serif";g.fillText("Earth",12,96);
+ FX=FX.filter(function(x){return now-x.t0<1600});
+ FX.forEach(function(x){var p=(now-x.t0)/1600;
+  if(x.k==="dl"){g.fillStyle=acc;for(var i=0;i<6;i++){var q=Math.min(1,Math.max(0,p*1.4-i*.12));if(q>0&&q<1){g.beginPath();g.arc(px+(26-px)*q,py+(70-py)*q,3,0,7);g.fill()}}}
+  else if(x.k==="obs"){g.strokeStyle=warn;g.globalAlpha=1-p;g.lineWidth=2;g.beginPath();g.moveTo(px,py);g.lineTo(300,70);g.stroke();g.lineWidth=1}
+  else if(x.k==="rch"){g.fillStyle=warn;g.globalAlpha=.4*(1-p);g.beginPath();g.arc(px,py,10+p*14,0,7);g.fill()}
+  else if(x.k==="ev"){g.strokeStyle=bad;g.globalAlpha=1-p;g.beginPath();g.arc(px,py,6+p*40,0,7);g.stroke()}
+  g.globalAlpha=1});
+ TR.push([px,py]);if(TR.length>45)TR.shift();TR.forEach(function(q,i){g.globalAlpha=i/45*.5;g.fillStyle=acc;g.fillRect(q[0],q[1],2,2)});g.globalAlpha=1;
+ if(LA&&now-LA<2600){var lp=(now-LA)/2600,rx=30+lp*260,ry=70-Math.sin(lp*3)*38;g.save();g.translate(rx,ry);g.rotate(-.5+lp*.9);g.fillStyle=ink;g.fillRect(-9,-3,18,6);g.beginPath();g.moveTo(9,-3);g.lineTo(16,0);g.lineTo(9,3);g.fill();g.fillStyle=warn;g.beginPath();g.moveTo(-9,-2);g.lineTo(-18-Math.random()*8,0);g.lineTo(-9,2);g.fill();g.restore()}
+ g.fillStyle=low?bad:ink;g.beginPath();g.arc(px,py,5,0,7);g.fill()}
+var NET={on:false,host:false,room:null,role:0,code:"",key:""},DR={dest:0,orb:0,lv:1,bus:1,eng:1,ins:2,com:3},LOGS=[],bcT=null;
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return "&#"+c.charCodeAt(0)+";"})}
+function peers(){return NET.room?NET.room.peers().filter(function(p){return p.kind==="viewer"}):[]}
+function mine(r){if(!NET.on)return true;if(NET.role===r)return true;return NET.host&&!peers().some(function(p){return p.presence&&p.presence.role===r})}
+function whoIs(r){var p=peers().filter(function(p){return p.presence&&p.presence.role===r})[0];return p?esc(String(p.presence.nm||"A player").slice(0,16)):"Nobody (the host covers)"}
+function rt(tp,d){if(NET.room)NET.room.emit(tp,d).catch(function(){})}
+function send(t,d){d=d||{};d.t=t;rt("gact",d)}
+function isHostMsg(m){var p=peers().filter(function(x){return x.peer===m.peer})[0];return !!(p&&p.presence&&p.presence.host===1)}
+function clean(h){var t=document.createElement("template");t.innerHTML=String(h);var okt="H2 DIV P H3 UL LI BUTTON B I";t.content.querySelectorAll("*").forEach(function(e){if(okt.indexOf(e.tagName)<0)e.remove();else Array.from(e.attributes).forEach(function(a){if(a.name!=="class"&&a.name!=="id")e.removeAttribute(a.name)})});return t.innerHTML}
+function bc(){if(!NET.on||!NET.host||bcT)return;bcT=setTimeout(function(){bcT=null;var f=null;
+ if(F)f={d:F.day,l:F.life,b:Math.round(F.bat*10)/10,u:Math.round(F.buf*10)/10,v:Math.round(F.bufV*10)/10,s:Math.round(F.score*10)/10,r:F.res,r0:F.res0,k:F.live.map(function(x){return x.ok?1:0}),m:F.cm,o:F.boost,g:F.gs?1:0,bw:F.brown,x:F.lost,us:F.used,sw:F.sw,an:F.ant,di:F.dim,p:F.pr,e:F.evi};
+ rt("gstate",{S:S,f:f,ph:$("flight").style.display==="block"?1:0,df:+$("diff").value,lg:LOGS.slice(0,6)})},120)}
+function applyPick(k,id){if(k==="ins"){var i=S.ins.indexOf(id);if(i>-1)S.ins.splice(i,1);else S.ins.push(id)}else{S[k]=id;if(k==="dest")S.ins=S.ins.filter(function(x){return (by(INS,x).no||"").indexOf(id)<0})}update()}
+function applyState(m){if(!m||typeof m!=="object"||!m.S)return;var s=m.S;
+ ["dest","lv","bus","eng","com","orb"].forEach(function(k){S[k]=by(ARR[k],s[k])?s[k]:null});
+ S.ins=(Array.isArray(s.ins)?s.ins:[]).filter(function(i){return by(INS,i)});
+ $("diff").value=String(Math.max(0,Math.min(2,+m.df||0)));
+ var f=m.f;
+ if(m.ph&&f){var c=calc();if(!c.d||!c.lv||!c.bus||!c.e||!c.cm||!c.o)return;
+  var used={};UPG.forEach(function(u){if(f.us&&f.us[u.id])used[u.id]=1});
+  F={c:c,day:+f.d,life:+f.l,bat:+f.b,buf:+f.u,bufV:+f.v,score:+f.s,res:+f.r,res0:+f.r0,live:c.ins.map(function(i,k){return{i:i,ok:!!(f.k&&f.k[k])}}),cm:+f.m,boost:+f.o,gs:!!f.g,brown:+f.bw,lost:+f.x,used:used,sw:+f.sw,ant:+f.an,dim:+f.di,pr:f.p,evi:f.e};
+  LOGS=(Array.isArray(m.lg)?m.lg:[]).slice(0,6).map(String);
+  $("log").innerHTML=LOGS.map(function(x){return "<li>"+clean(x)+"</li>"}).join("");
+  show("flight");dash();
+  if(f.p!=="o")$("result").hidden=true;
+  var key=[f.p,f.d,f.e,Math.round(f.r),JSON.stringify(f.us)].join("|");
+  if(key!==NET.key){NET.key=key;
+   if(f.p==="t"&&F.day<F.life)turn();
+   else if(f.p==="e"&&EV[f.e])event(+f.e);
+   else if(f.p==="o")$("prompt").innerHTML=""}
+ }else{NET.key="";if($("design").style.display!=="grid")show("design");update()}}
+function onAct(m){if(!NET.host)return;var d=m.data||{},p=peers().filter(function(x){return x.peer===m.peer})[0],r=p&&p.presence?p.presence.role:-1;
+ if(d.t==="pick"){if(r===DR[d.k]&&ARR[d.k]&&by(ARR[d.k],d.id)&&$("flight").style.display!=="block")applyPick(d.k,d.id)}
+ else if(d.t==="act"&&F&&F.pr==="t"&&r===0&&["obs","dl","rch"].indexOf(d.m)>-1)act(d.m);
+ else if(d.t==="upg"&&F&&F.pr==="t"&&r===0){var u=by(UPG,d.id);if(u&&!F.used[u.id]&&u.c<=F.res){F.res-=u.c;F.used[u.id]=1;lg("Upgrade",u.fn());beep(660,.12);turn()}}
+ else if(d.t==="ev"&&F&&F.pr==="e"){var ev=EV[F.evi];if(ev&&r===ev.role&&ev.ch[d.k]&&!(ev.ch[d.k].cost>F.res))pick(ev,+d.k)}
+ else if(d.t==="again"&&F&&F.pr==="o")launch();
+ else if(d.t==="redo"&&F&&F.pr==="o"){show("design");update()}}
+function nstat(){if(!NET.on)return;var p=peers();$("nst").textContent="Room "+NET.code+": "+p.length+" player"+(p.length===1?"":"s")+(NET.host?" (you host).":".")+" Share the code."}
+async function joinNet(host){var code=($("rc").value||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,12);
+ if(host&&!code)code=Math.random().toString(36).slice(2,6);
+ if(!code){$("nst").textContent="Type the room code your host shared.";return}
+ if(NET.on){$("nst").textContent="Already in a room. Reload the page to switch.";return}
+ var R=null;try{R=window.claude&&await claude.use("room")}catch(e){}
+ if(!R){$("nst").textContent="Online play needs this page shared with you as a contributor or editor.";return}
+ try{NET.room=await R.join("mission-"+code)}catch(e){$("nst").textContent="Could not join the room.";return}
+ NET.on=true;NET.host=!!host;NET.role=+$("rl").value;NET.code=code;$("rc").value=code;
+ NET.room.presence({role:NET.role,nm:($("nm").value||"Player").slice(0,16),host:host?1:0});
+ NET.room.on("gact",onAct);
+ NET.room.on("gstate",function(m){if(!NET.host&&isHostMsg(m))applyState(m.data)});
+ NET.room.on("gtick",function(m){var d=m.data||{},b=$("tbar"),s=$("tsec");if(!NET.host&&isHostMsg(m)&&b&&s&&+d.t>0){b.style.width=Math.max(0,Math.min(100,+d.l/(+d.t*10)*100))+"%";s.textContent=Math.ceil(+d.l/10)+" seconds to decide"}});
+ NET.room.on("gres",function(m){if(NET.host||!isHostMsg(m))return;var d=m.data||{};$("result").hidden=false;$("result").innerHTML=clean(d.h||"");$("prompt").innerHTML="";var a=$("again"),r=$("redo"),c=$("copy");if(a)a.onclick=function(){send("again")};if(r)r.onclick=function(){send("redo")};if(c)c.remove();if(/Outstanding|Successful/.test($("result").textContent))confetti()});
+ NET.room.onPeers(function(){nstat();bc();update()});
+ nstat();update()}
+$("hostb").onclick=function(){joinNet(true)};$("joinb").onclick=function(){joinNet(false)};
+$("rl").onchange=function(){NET.role=+this.value;if(NET.room)NET.room.presence({role:NET.role});update()};
+var FX=[],LA=0,TR=[];
+var ICON={"lv:s":"🚀","lv:m":"🚀🚀","lv:h":"🚀🚀🚀","bus:b":"📦","bus:s":"🛰️","bus:h":"🛡️","eng:sto":"🔥","eng:cry":"❄️","eng:ion":"⚡","com:l":"📻","com:m":"📡","com:h":"🌐","orb:lo":"⬇️","orb:mi":"🔄","orb:hi":"⬆️","ins:cam":"📷","ins:spec":"🔬","ins:rad":"🌊","ins:seis":"📈","ins:rov":"🚙"};
+function planetSVG(id){var d=by(DEST,id),c=d.col,f="";
+ if(id==="moon")f='<circle cx="16" cy="18" r="4" opacity=".25"/><circle cx="28" cy="26" r="5" opacity=".25"/><circle cx="20" cy="30" r="2.5" opacity=".25"/>';
+ else if(id==="mars")f='<ellipse cx="22" cy="6" rx="8" ry="3" fill="#fff" opacity=".8"/><path d="M8 24q10-6 22 2" stroke="#7a2e14" stroke-width="3" fill="none" opacity=".5"/>';
+ else if(id==="europa")f='<path d="M6 16L20 22 32 14M12 32L24 24 38 30M20 4L22 22" stroke="#b5523b" stroke-width="1.2" fill="none" opacity=".7"/>';
+ else if(id==="venus")f='<ellipse cx="22" cy="14" rx="18" ry="3" fill="#fff" opacity=".35"/><ellipse cx="22" cy="24" rx="19" ry="3.5" fill="#a86a1c" opacity=".35"/><ellipse cx="22" cy="33" rx="14" ry="2.5" fill="#fff" opacity=".3"/>';
+ else f='<polygon points="12,14 20,10 26,16 18,20" fill="#3d372f" opacity=".5"/><polygon points="24,26 32,24 33,31 26,33" fill="#3d372f" opacity=".5"/>';
+ return '<svg class="pl" viewBox="0 0 44 44" width="44" height="44" aria-hidden="true"><defs><radialGradient id="g-'+id+'" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="'+c+'" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient><clipPath id="c-'+id+'"><circle cx="22" cy="22" r="20"/></clipPath></defs><circle cx="22" cy="22" r="20" fill="'+c+'"/><g clip-path="url(#c-'+id+')">'+f+'</g><circle cx="22" cy="22" r="20" fill="url(#g-'+id+')"/></svg>'}
+function ic(k,x){return k==="dest"?planetSVG(x.id):'<span class="ic" aria-hidden="true">'+(ICON[k+":"+x.id]||"")+"</span>"}
+function confetti(){if(RM)return;var c=document.createElement("canvas");c.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9";c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);var x=c.getContext("2d"),cols=["#4FD1C5","#FFA94D","#FF7A70","#E6EDF5","#6FD39A"],P=[];for(var i=0;i<110;i++)P.push({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,v:2+Math.random()*3,s:4+Math.random()*5,r:Math.random()*6,c:cols[i%5]});var t0=performance.now();(function f(n){x.clearRect(0,0,c.width,c.height);P.forEach(function(p){p.y+=p.v;p.r+=.1;p.x+=Math.sin(p.r);x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s*.6)});if(n-t0<3200)requestAnimationFrame(f);else c.remove()})(t0)}
+function toast(t,c){var d=document.createElement("div");d.className="toast";d.textContent=t;if(c)d.style.color=c;document.body.appendChild(d);setTimeout(function(){d.remove()},1500)}
+function ship(){var b=S.bus&&by(BUS,S.bus),cm=S.com&&by(COM,S.com),e=S.eng&&by(ENG,S.eng),el=$("ship");
+ if(!b){el.innerHTML='<p class="hint" style="margin:0;text-align:center">Pick a bus to start building.</p>';return}
+ var w=b.id==="b"?46:b.id==="s"?64:90,pl=Math.round(b.sol/450*52+16),x=120-w/2,s='<svg viewBox="0 0 240 150" role="img" aria-label="Your spacecraft" style="width:100%;height:auto">';
+ s+='<rect x="'+(x-pl-4)+'" y="58" width="'+pl+'" height="22" rx="2" fill="var(--warn)"/><rect x="'+(x+w+4)+'" y="58" width="'+pl+'" height="22" rx="2" fill="var(--warn)"/>';
+ s+='<line x1="'+(x-4)+'" y1="69" x2="'+x+'" y2="69" stroke="var(--ink)" stroke-width="2"/><line x1="'+(x+w)+'" y1="69" x2="'+(x+w+4)+'" y2="69" stroke="var(--ink)" stroke-width="2"/>';
+ s+='<rect x="'+x+'" y="44" width="'+w+'" height="50" rx="6" fill="var(--acc)"/>';
+ if(cm){var r=Math.round(cm.rate/30*14+6);s+='<line x1="120" y1="44" x2="120" y2="32" stroke="var(--ink)" stroke-width="2"/><ellipse cx="120" cy="30" rx="'+r+'" ry="'+Math.round(r*.45)+'" fill="var(--ink)"/>'}
+ if(e){s+='<polygon points="110,94 130,94 136,114 104,114" fill="var(--ink)"/>';if(e.id==="ion")s+='<circle cx="120" cy="124" r="7" fill="var(--acc)" opacity=".75"/>';else s+='<polygon points="108,116 132,116 120,'+(e.id==="cry"?"138":"130")+'" fill="var(--warn)"/>'}
+ var cap=Math.max(1,Math.floor((w-6)/14));
+ S.ins.forEach(function(id,i){s+='<rect x="'+(x+6+(i%cap)*14)+'" y="'+(52+Math.floor(i/cap)*14)+'" width="10" height="10" rx="2" fill="var(--panel)"/>'});
+ var c=calc();s+='<text x="120" y="148" text-anchor="middle" font-size="10" fill="var(--mute)">'+Math.round(c.mass)+" kg at launch · "+S.ins.length+" instrument"+(S.ins.length===1?"":"s")+"</text></svg>";
+ el.innerHTML=s}
+function safe(){if(!S.dest)S.dest="moon";S.lv="m";S.bus="s";S.eng="cry";S.com="m";S.orb="mi";S.ins=["cam","spec"];update()}
+function surprise(){if(!S.dest)S.dest=DEST[Math.floor(Math.random()*DEST.length)].id;var rp=function(a){return a[Math.floor(Math.random()*a.length)].id};
+ for(var n=0;n<300;n++){S.lv=rp(LV);S.bus=rp(BUS);S.eng=rp(ENG);S.com=rp(COM);S.orb=rp(ORB);S.ins=INS.filter(function(x){return (!x.no||x.no.indexOf(S.dest)<0)&&Math.random()<.5}).map(function(x){return x.id});if(!S.ins.length)continue;var c=calc();if(c.cost<=c.budget&&c.mass<=c.lv.cap)break}update()}
+$("safeb").onclick=function(){if(NET.on&&!NET.host)return;safe()};$("randb").onclick=function(){if(NET.on&&!NET.host)return;surprise()};
+document.addEventListener("keydown",function(e){if($("flight").style.display!=="block"||e.ctrlKey||e.metaKey||e.altKey)return;if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;
+ var k=e.key.toLowerCase(),s=k==="o"?'[data-m="obs"]':k==="d"?'[data-m="dl"]':k==="r"?'[data-m="rch"]':/^[1-3]$/.test(k)?'[data-k="'+(k-1)+'"]':"";if(!s)return;
+ var b=document.querySelector("#prompt .act"+s);if(b&&!b.disabled){e.preventDefault();b.click()}});
+function board(s,n){try{var a=JSON.parse(localStorage.getItem("ma_scores")||"[]");a.push({s:s,n:n});a.sort(function(x,y){return y.s-x.s});localStorage.setItem("ma_scores",JSON.stringify(a.slice(0,5)))}catch(e){}renderBoard()}
+function renderBoard(){var a=[];try{a=JSON.parse(localStorage.getItem("ma_scores")||"[]")}catch(e){}
+ $("board").innerHTML=a.length?"<b>Your best missions</b><ol style='margin:4px 0 0;padding-left:20px'>"+a.map(function(x){return "<li>"+esc(x.n)+": "+(+x.s||0)+" pts</li>"}).join("")+"</ol>":""}
+var dlg=$("intro");function help(){if(dlg.showModal)dlg.showModal()}
+$("helpb").onclick=help;$("introgo").onclick=function(){try{localStorage.setItem("ma_seen","1")}catch(e){}dlg.close()};
+renderBoard();try{if(!localStorage.getItem("ma_seen"))help()}catch(e){help()}
+requestAnimationFrame(draw);
+update();
+</script>
+</body>
+</html>
