@@ -99,7 +99,7 @@ Plain HTML, CSS and JavaScript in a single file, with no external libraries. Fon
 
 ## Use of AI
 
-This project was built with help from **Claude** (Anthropic), an AI assistant. Claude helped design the game, wrote the code, researched the real-world figures listed above. The visuals are drawn in code and contain no NASA logos or mission identifiers. I was testing it, giving commands where i felt a room for betterment. At first it was a very simple without any visual. But we managed to add visuals to make it next level. Its still a simple game but interactive one.
+This project was built with help from **Claude** (Anthropic), an AI assistant. Claude helped design the game, wrote the code, researched the real-world figures listed above. The visuals are drawn in code and contain no NASA logos or mission identifiers. I was testing it, giving commands where i felt a room for betterment. For example the idea of making players fly the mission live, because the first version felt boring, or the choice to add team roles. At first it was a very simple without any visual. But we managed to add visuals to make it next level. Its still a simple game but interactive one.
 
 ## Credits
 
