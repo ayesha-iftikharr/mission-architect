@@ -4,8 +4,9 @@
 
 Built for the NASA Space Apps Challenge 2026, challenge: *Space Mission Design Game*.
 
-**Play it:** [YOUR GITHUB PAGES LINK]
-**Team:** Launch Window · Ayesha Iftikhar, Zainab Sultan, Aima Hassan, Eman Waheed
+**Play it:** https://github.com/ayesha-iftikharr/mission-architect
+**Team:** Launch Window 
+**Members** Ayesha Iftikhar, Zainab Sultan, Aima Hassan, Eman Waheed
 
 ---
 
